@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Berichtsheft Assistent</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #0f0f13;
+      color: #e8e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      background: #1a1a24;
+      border: 1px solid #2e2e3e;
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 480px;
+    }
+
+    h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .subtitle {
+      font-size: 14px;
+      color: #7070a0;
+      margin-bottom: 32px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      color: #9090b0;
+      margin-bottom: 6px;
+      margin-top: 16px;
+    }
+
+    input, select {
+      width: 100%;
+      background: #12121a;
+      border: 1px solid #2e2e3e;
+      border-radius: 8px;
+      padding: 12px 14px;
+      color: #e8e8f0;
+      font-size: 15px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: #6060ff;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 28px;
+      background: #5050ee;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover:not(:disabled) { background: #4040dd; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    #log {
+      margin-top: 24px;
+      background: #12121a;
+      border: 1px solid #2e2e3e;
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 13px;
+      font-family: monospace;
+      color: #70d0a0;
+      max-height: 220px;
+      overflow-y: auto;
+      display: none;
+    }
+
+    .log-line { margin-bottom: 4px; }
+    .log-error { color: #f07070; }
+    .log-done { color: #50d090; font-weight: bold; }
+
+    .status-badge {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-running { background: #2a2a60; color: #8080ff; }
+    .badge-done    { background: #1a4030; color: #50d090; }
+    .badge-error   { background: #401a1a; color: #f07070; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>📋 Berichtsheft Assistent</h1>
+    <p class="subtitle">Füllt dein Berichtsheft automatisch aus</p>
+
+    <label>Website URL</label>
+    <input id="website" type="url" value="https://autokaufmann.vogel.de/academy" placeholder="https://..." />
+
+    <label>E-Mail / Benutzername</label>
+    <input id="username" type="email" placeholder="deine@email.de" />
+
+    <label>Passwort</label>
+    <input id="password" type="password" placeholder="••••••••" />
+
+    <div class="row">
+      <div>
+        <label>Monat</label>
+        <select id="month"></select>
+      </div>
+      <div>
+        <label>Jahr</label>
+        <select id="year"></select>
+      </div>
+    </div>
+
+    <button id="startBtn" onclick="start()">Berichtsheft ausfüllen</button>
+
+    <div id="log"></div>
+  </div>
+
+  <script>
+    const BACKEND = 'https://meinberichtsheft.up.railway.app';
+
+    const monate = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+    const monthSel = document.getElementById('month');
+    const yearSel = document.getElementById('year');
+    const now = new Date();
+
+    monate.forEach((m, i) => {
+      const opt = document.createElement('option');
+      opt.value = i + 1;
+      opt.textContent = m;
+      if (i + 1 === now.getMonth() + 1) opt.selected = true;
+      monthSel.appendChild(opt);
+    });
+
+    for (let y = now.getFullYear(); y >= now.getFullYear() - 2; y--) {
+      const opt = document.createElement('option');
+      opt.value = y;
+      opt.textContent = y;
+      yearSel.appendChild(opt);
+    }
+
+    async function start() {
+      const btn = document.getElementById('startBtn');
+      const logEl = document.getElementById('log');
+
+      const body = {
+        website:  document.getElementById('website').value,
+        username: document.getElementById('username').value,
+        password: document.getElementById('password').value,
+        month:    parseInt(monthSel.value),
+        year:     parseInt(yearSel.value),
+      };
+
+      if (!body.username || !body.password) {
+        alert('Bitte E-Mail und Passwort eingeben.');
+        return;
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Läuft...';
+      logEl.style.display = 'block';
+      logEl.innerHTML = '<div class="log-line">Starte...</div>';
+
+      try {
+        const res = await fetch(`${BACKEND}/fill`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        const { jobId } = await res.json();
+
+        // Polling alle 2 Sekunden
+        const interval = setInterval(async () => {
+          const status = await fetch(`${BACKEND}/status/${jobId}`).then(r => r.json());
+
+          logEl.innerHTML = status.log.map(l => {
+            const cls = l.startsWith('✅') ? 'log-done' : l.startsWith('❌') ? 'log-error' : 'log-line';
+            return `<div class="${cls}">${l}</div>`;
+          }).join('');
+          logEl.scrollTop = logEl.scrollHeight;
+
+          if (status.status === 'done') {
+            clearInterval(interval);
+            btn.disabled = false;
+            btn.textContent = '✅ Fertig!';
+          } else if (status.status === 'error') {
+            clearInterval(interval);
+            btn.disabled = false;
+            btn.textContent = 'Erneut versuchen';
+            logEl.innerHTML += `<div class="log-error">Fehler: ${status.error}</div>`;
+          }
+        }, 2000);
+
+      } catch (e) {
+        logEl.innerHTML += `<div class="log-error">Verbindungsfehler: ${e.message}</div>`;
+        btn.disabled = false;
+        btn.textContent = 'Erneut versuchen';
+      }
+    }
+  </script>
+</body>
+</html>
