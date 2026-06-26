@@ -3,232 +3,509 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Berichtsheft Assistent</title>
+  <title>AzubiReport – Digitales Berichtsheft</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:    #0D1B2A;
+      --navy2:   #1B2D42;
+      --blue:    #1A56DB;
+      --blue-h:  #1648C0;
+      --silver:  #F4F6F9;
+      --border:  #DDE3ED;
+      --text:    #1A202C;
+      --muted:   #6B7A8D;
+      --white:   #FFFFFF;
+      --green:   #0A7C4A;
+      --red:     #B91C1C;
+    }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #0f0f13;
-      color: #e8e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--silver);
+      color: var(--text);
       min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      background: var(--navy);
+      padding: 0 32px;
+      height: 60px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      padding: 24px;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
     }
-
-    .card {
-      background: #1a1a24;
-      border: 1px solid #2e2e3e;
-      border-radius: 16px;
-      padding: 40px;
-      width: 100%;
-      max-width: 480px;
-    }
-
-    h1 {
-      font-size: 22px;
+    .logo {
+      color: var(--white);
+      font-size: 17px;
       font-weight: 700;
-      margin-bottom: 8px;
+      letter-spacing: -0.3px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-badge {
+      background: var(--blue);
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+    }
+    .nav-links { display: flex; gap: 8px; }
+    .nav-btn {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.85);
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .nav-btn:hover { background: rgba(255,255,255,0.08); }
+    .nav-btn.primary {
+      background: var(--blue);
+      border-color: var(--blue);
       color: #fff;
     }
+    .nav-btn.primary:hover { background: var(--blue-h); }
 
-    .subtitle {
+    /* ── PAGES ── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ── HERO ── */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 100%);
+      padding: 80px 32px 72px;
+      text-align: center;
+    }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(26,86,219,0.25);
+      color: #93BBFD;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid rgba(26,86,219,0.4);
+      margin-bottom: 20px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      color: var(--white);
+      font-size: 38px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 18px;
+      letter-spacing: -0.5px;
+    }
+    .hero h1 span { color: #93BBFD; }
+    .hero p {
+      color: rgba(255,255,255,0.65);
+      font-size: 17px;
+      max-width: 520px;
+      margin: 0 auto 36px;
+      line-height: 1.6;
+    }
+    .hero-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      padding: 13px 28px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: var(--blue-h); }
+    .btn-outline {
+      background: transparent;
+      color: rgba(255,255,255,0.8);
+      border: 1px solid rgba(255,255,255,0.25);
+      padding: 13px 28px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-outline:hover { background: rgba(255,255,255,0.07); }
+
+    /* ── FEATURES ── */
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1px;
+      background: var(--border);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .feature {
+      background: var(--white);
+      padding: 28px 28px;
+    }
+    .feature-icon {
+      width: 40px; height: 40px;
+      background: #EEF2FF;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+    .feature h3 { font-size: 14px; font-weight: 700; margin-bottom: 6px; color: var(--text); }
+    .feature p { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    /* ── HOW IT WORKS ── */
+    .how { padding: 64px 32px; max-width: 800px; margin: 0 auto; }
+    .how h2 { font-size: 24px; font-weight: 800; margin-bottom: 40px; text-align: center; }
+    .steps { display: flex; flex-direction: column; gap: 0; }
+    .step { display: flex; gap: 20px; padding: 0 0 32px; }
+    .step-num {
+      flex-shrink: 0;
+      width: 36px; height: 36px;
+      background: var(--navy);
+      color: #fff;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
       font-size: 14px;
-      color: #7070a0;
-      margin-bottom: 32px;
+      font-weight: 700;
+    }
+    .step-content h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .step-content p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+
+    /* ── APP PAGE ── */
+    .app-header {
+      background: var(--navy);
+      padding: 24px 32px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .app-header h2 { color: #fff; font-size: 18px; font-weight: 700; }
+    .app-header p { color: rgba(255,255,255,0.5); font-size: 13px; margin-top: 2px; }
+
+    .app-body { max-width: 560px; margin: 40px auto; padding: 0 24px; }
+
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      margin-bottom: 18px;
     }
 
     label {
       display: block;
       font-size: 13px;
-      color: #9090b0;
+      font-weight: 600;
+      color: var(--text);
       margin-bottom: 6px;
-      margin-top: 16px;
+      margin-top: 14px;
     }
+    label:first-of-type { margin-top: 0; }
 
     input, select {
       width: 100%;
-      background: #12121a;
-      border: 1px solid #2e2e3e;
-      border-radius: 8px;
-      padding: 12px 14px;
-      color: #e8e8f0;
-      font-size: 15px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      padding: 10px 13px;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--white);
       outline: none;
-      transition: border-color 0.2s;
+      transition: border-color 0.15s;
     }
+    input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,86,219,0.12); }
 
-    input:focus, select:focus {
-      border-color: #6060ff;
-    }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    button {
+    .submit-btn {
       width: 100%;
-      margin-top: 28px;
-      background: #5050ee;
+      background: var(--blue);
       color: #fff;
       border: none;
       border-radius: 8px;
-      padding: 14px;
+      padding: 13px;
       font-size: 15px;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.15s;
+      margin-top: 20px;
     }
+    .submit-btn:hover:not(:disabled) { background: var(--blue-h); }
+    .submit-btn:disabled { opacity: 0.55; cursor: not-allowed; }
 
-    button:hover:not(:disabled) { background: #4040dd; }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
-
+    /* ── LOG ── */
     #log {
-      margin-top: 24px;
-      background: #12121a;
-      border: 1px solid #2e2e3e;
+      background: #0D1B2A;
+      border: 1px solid #1e3a5f;
       border-radius: 8px;
       padding: 16px;
-      font-size: 13px;
-      font-family: monospace;
-      color: #70d0a0;
-      max-height: 220px;
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      color: #7EC8A4;
+      max-height: 200px;
       overflow-y: auto;
       display: none;
+      margin-top: 16px;
     }
+    .log-line { margin-bottom: 3px; }
+    .log-error { color: #FCA5A5; }
+    .log-done { color: #6EE7B7; font-weight: bold; }
 
-    .log-line { margin-bottom: 4px; }
-    .log-error { color: #f07070; }
-    .log-done { color: #50d090; font-weight: bold; }
-
-    .status-badge {
-      display: inline-block;
-      margin-top: 12px;
-      padding: 4px 12px;
-      border-radius: 20px;
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 32px 16px;
       font-size: 12px;
-      font-weight: 600;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      margin-top: 48px;
     }
-    .badge-running { background: #2a2a60; color: #8080ff; }
-    .badge-done    { background: #1a4030; color: #50d090; }
-    .badge-error   { background: #401a1a; color: #f07070; }
+    .disclaimer {
+      background: #FFF7ED;
+      border: 1px solid #FDE68A;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 12px;
+      color: #92400E;
+      margin-top: 16px;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>📋 Berichtsheft Assistent</h1>
-    <p class="subtitle">Füllt dein Berichtsheft automatisch aus</p>
 
-    <label>Website URL</label>
-    <input id="website" type="url" value="https://autokaufmann.vogel.de/academy" placeholder="https://..." />
+<!-- NAV -->
+<nav>
+  <div class="logo">
+    AzubiReport
+    <span class="logo-badge">BETA</span>
+  </div>
+  <div class="nav-links">
+    <button class="nav-btn" onclick="showPage('landing')">Startseite</button>
+    <button class="nav-btn primary" onclick="showPage('app')">Berichtsheft ausfüllen →</button>
+  </div>
+</nav>
 
-    <label>E-Mail / Benutzername</label>
-    <input id="username" type="email" placeholder="deine@email.de" />
+<!-- LANDING PAGE -->
+<div id="page-landing" class="page active">
 
-    <label>Passwort</label>
-    <input id="password" type="password" placeholder="••••••••" />
+  <div class="hero">
+    <div class="hero-tag">Digitale Ausbildungsverwaltung</div>
+    <h1>Das <span>Berichtsheft</span><br>schreibt sich von selbst.</h1>
+    <p>AzubiReport füllt dein digitales Berichtsheft automatisch aus — rechtssicher, vollständig und in Sekunden.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="showPage('app')">Jetzt starten</button>
+      <button class="btn-outline" onclick="document.querySelector('.how').scrollIntoView({behavior:'smooth'})">So funktioniert's</button>
+    </div>
+  </div>
 
-    <div class="row">
-      <div>
-        <label>Monat</label>
-        <select id="month"></select>
+  <div class="features">
+    <div class="feature">
+      <div class="feature-icon">⚡</div>
+      <h3>Automatisch</h3>
+      <p>Alle Werktage des Monats werden in Sekunden ausgefüllt und eingereicht.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">📋</div>
+      <h3>Vollständig</h3>
+      <p>Tätigkeitsbeschreibungen werden realistisch und abwechslungsreich generiert.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🏫</div>
+      <h3>Schulferiensicher</h3>
+      <p>Bayerische Schulferien werden automatisch erkannt und korrekt behandelt.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">🔒</div>
+      <h3>Sicher</h3>
+      <p>Deine Zugangsdaten werden nur für den Einmalzugriff verwendet und nicht gespeichert.</p>
+    </div>
+  </div>
+
+  <div class="how">
+    <h2>So funktioniert AzubiReport</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h3>Zugangsdaten eingeben</h3>
+          <p>Trage die URL deiner Berichtsheft-Plattform sowie deine Login-Daten ein. Sie werden nicht gespeichert.</p>
+        </div>
       </div>
-      <div>
-        <label>Jahr</label>
-        <select id="year"></select>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h3>Monat auswählen</h3>
+          <p>Wähle den Monat, für den das Berichtsheft ausgefüllt werden soll.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h3>Automatisch ausfüllen lassen</h3>
+          <p>AzubiReport öffnet deine Plattform im Hintergrund, füllt alle Einträge aus und reicht das Berichtsheft automatisch ein.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    AzubiReport — Digitale Ausbildungsunterstützung &nbsp;·&nbsp; Nur für autorisierte Nutzer
+  </footer>
+</div>
+
+<!-- APP PAGE -->
+<div id="page-app" class="page">
+  <div class="app-header">
+    <h2>Berichtsheft ausfüllen</h2>
+    <p>Alle Felder ausfüllen und den Vorgang starten</p>
+  </div>
+
+  <div class="app-body">
+    <div class="card">
+      <div class="card-title">Plattform & Zugangsdaten</div>
+      <label>Website URL</label>
+      <input id="website" type="url" value="https://autokaufmann.vogel.de/academy" />
+      <label>E-Mail / Benutzername</label>
+      <input id="username" type="email" placeholder="name@betrieb.de" />
+      <label>Passwort</label>
+      <input id="password" type="password" placeholder="••••••••" />
+    </div>
+
+    <div class="card">
+      <div class="card-title">Berichtszeitraum</div>
+      <div class="row">
+        <div>
+          <label>Monat</label>
+          <select id="month"></select>
+        </div>
+        <div>
+          <label>Jahr</label>
+          <select id="year"></select>
+        </div>
       </div>
     </div>
 
-    <button id="startBtn" onclick="start()">Berichtsheft ausfüllen</button>
+    <div class="disclaimer">
+      ⚠ Bitte stelle sicher, dass du berechtigt bist, diese Aktion durchzuführen. AzubiReport übermittelt Daten ausschließlich an die von dir angegebene Plattform.
+    </div>
+
+    <button class="submit-btn" id="startBtn" onclick="start()">Berichtsheft jetzt ausfüllen →</button>
 
     <div id="log"></div>
+
+    <footer style="margin-top: 24px; padding: 16px 0;">
+      AzubiReport Beta &nbsp;·&nbsp; <a href="#" onclick="showPage('landing')" style="color:var(--muted)">Startseite</a>
+    </footer>
   </div>
+</div>
 
-  <script>
-    const BACKEND = 'https://meinberichtsheft.up.railway.app';
+<script>
+  const BACKEND = 'https://meinberichtsheft.up.railway.app';
 
-    const monate = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-    const monthSel = document.getElementById('month');
-    const yearSel = document.getElementById('year');
-    const now = new Date();
+  const monate = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  const now = new Date();
+  const monthSel = document.getElementById('month');
+  const yearSel = document.getElementById('year');
 
-    monate.forEach((m, i) => {
-      const opt = document.createElement('option');
-      opt.value = i + 1;
-      opt.textContent = m;
-      if (i + 1 === now.getMonth() + 1) opt.selected = true;
-      monthSel.appendChild(opt);
-    });
+  monate.forEach((m, i) => {
+    const opt = document.createElement('option');
+    opt.value = i + 1;
+    opt.textContent = m;
+    if (i + 1 === now.getMonth() + 1) opt.selected = true;
+    monthSel.appendChild(opt);
+  });
 
-    for (let y = now.getFullYear(); y >= now.getFullYear() - 2; y--) {
-      const opt = document.createElement('option');
-      opt.value = y;
-      opt.textContent = y;
-      yearSel.appendChild(opt);
+  for (let y = now.getFullYear(); y >= now.getFullYear() - 2; y--) {
+    const opt = document.createElement('option');
+    opt.value = y;
+    opt.textContent = y;
+    yearSel.appendChild(opt);
+  }
+
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + name).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  async function start() {
+    const btn = document.getElementById('startBtn');
+    const logEl = document.getElementById('log');
+
+    const body = {
+      website:  document.getElementById('website').value,
+      username: document.getElementById('username').value,
+      password: document.getElementById('password').value,
+      month:    parseInt(monthSel.value),
+      year:     parseInt(yearSel.value),
+    };
+
+    if (!body.username || !body.password) {
+      alert('Bitte E-Mail und Passwort eingeben.');
+      return;
     }
 
-    async function start() {
-      const btn = document.getElementById('startBtn');
-      const logEl = document.getElementById('log');
+    btn.disabled = true;
+    btn.textContent = 'Läuft…';
+    logEl.style.display = 'block';
+    logEl.innerHTML = '<div class="log-line">Verbinde mit Server…</div>';
 
-      const body = {
-        website:  document.getElementById('website').value,
-        username: document.getElementById('username').value,
-        password: document.getElementById('password').value,
-        month:    parseInt(monthSel.value),
-        year:     parseInt(yearSel.value),
-      };
+    try {
+      const res = await fetch(`${BACKEND}/fill`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const { jobId } = await res.json();
 
-      if (!body.username || !body.password) {
-        alert('Bitte E-Mail und Passwort eingeben.');
-        return;
-      }
+      const interval = setInterval(async () => {
+        const status = await fetch(`${BACKEND}/status/${jobId}`).then(r => r.json());
 
-      btn.disabled = true;
-      btn.textContent = 'Läuft...';
-      logEl.style.display = 'block';
-      logEl.innerHTML = '<div class="log-line">Starte...</div>';
+        logEl.innerHTML = status.log.map(l => {
+          const cls = l.startsWith('✅') ? 'log-done' : l.startsWith('❌') ? 'log-error' : 'log-line';
+          return `<div class="${cls}">${l}</div>`;
+        }).join('');
+        logEl.scrollTop = logEl.scrollHeight;
 
-      try {
-        const res = await fetch(`${BACKEND}/fill`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(body),
-        });
-        const { jobId } = await res.json();
+        if (status.status === 'done') {
+          clearInterval(interval);
+          btn.disabled = false;
+          btn.textContent = '✅ Erfolgreich abgeschlossen';
+          btn.style.background = '#0A7C4A';
+        } else if (status.status === 'error') {
+          clearInterval(interval);
+          btn.disabled = false;
+          btn.textContent = 'Erneut versuchen';
+          logEl.innerHTML += `<div class="log-error">Fehler: ${status.error}</div>`;
+        }
+      }, 2000);
 
-        // Polling alle 2 Sekunden
-        const interval = setInterval(async () => {
-          const status = await fetch(`${BACKEND}/status/${jobId}`).then(r => r.json());
-
-          logEl.innerHTML = status.log.map(l => {
-            const cls = l.startsWith('✅') ? 'log-done' : l.startsWith('❌') ? 'log-error' : 'log-line';
-            return `<div class="${cls}">${l}</div>`;
-          }).join('');
-          logEl.scrollTop = logEl.scrollHeight;
-
-          if (status.status === 'done') {
-            clearInterval(interval);
-            btn.disabled = false;
-            btn.textContent = '✅ Fertig!';
-          } else if (status.status === 'error') {
-            clearInterval(interval);
-            btn.disabled = false;
-            btn.textContent = 'Erneut versuchen';
-            logEl.innerHTML += `<div class="log-error">Fehler: ${status.error}</div>`;
-          }
-        }, 2000);
-
-      } catch (e) {
-        logEl.innerHTML += `<div class="log-error">Verbindungsfehler: ${e.message}</div>`;
-        btn.disabled = false;
-        btn.textContent = 'Erneut versuchen';
-      }
+    } catch (e) {
+      logEl.innerHTML += `<div class="log-error">Verbindungsfehler: ${e.message}</div>`;
+      btn.disabled = false;
+      btn.textContent = 'Erneut versuchen';
     }
-  </script>
+  }
+</script>
 </body>
 </html>
